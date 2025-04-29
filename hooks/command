@@ -35,8 +35,6 @@ function run_ios_unit_tests_and_sonar() {
   # add sleep due to sometimes "xcrun simctl list" takes more than a few moments and script fails when trying to remove CoreSimulatorSerivce
   sleep 10
 
-  xcrun simctl list devices
-
   # Set and boot the desired simulator with retries
   echo "~~~ Set and boot the desired simulator with retries"
   RETRIES=5
@@ -58,7 +56,7 @@ function run_ios_unit_tests_and_sonar() {
   echo "~~~ Install iOS dependencies"
   cd ios/library/test-harness
   bundle install --quiet
-  bundle exec pod update
+  bundle exec pod install
 
   echo "~~~ build-wrapper"
   build-wrapper --out-dir $BUILD_WRAPPER_OUTPUT_DIR xcodebuild -workspace $WORKSPACE -scheme $SCHEME -sdk iphonesimulator -destination "platform=iOS Simulator,name=$SIMULATOR,OS=$OS_VERSION" build
@@ -75,7 +73,7 @@ function run_ios_unit_tests_and_sonar() {
   # Run sonar-scanner
   sonar-scanner \
   -Dsonar.cfamily.build-wrapper-output="$BUILD_WRAPPER_OUTPUT_DIR" \
-  -Dsonar.coverageReportPaths=Library/sonarqube-generic-coverage.xml \
+  -Dsonar.coverageReportPaths=sonarqube-generic-coverage.xml \
   -Dsonar.projectBaseDir=.
 }
 
