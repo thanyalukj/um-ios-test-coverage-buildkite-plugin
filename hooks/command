@@ -13,7 +13,6 @@ FD_NPM_REPO="${BUILDKITE_PLUGIN_UM_IOS_TEST_COVERAGE_FD_NPM_REPO:-undefined}"
 SKIP=$(buildkite-agent meta-data get 'skip-test' --default 'true')
 SIMULATOR="iPhone 16 Pro"
 OS_VERSION="18.2"
-DESTINATION="platform=iOS Simulator,name=${SIMULATOR},OS=${OS_VERSION}"
 BUILD_WRAPPER_OUTPUT_DIR="build_wrapper_output_directory"
 sudo xcode-select --switch /Applications/Xcode_16.2.app/Contents/Developer
 
@@ -62,20 +61,20 @@ function run_ios_unit_tests_and_sonar() {
   bundle exec pod update
 
   echo "~~~ build-wrapper"
-  build-wrapper --out-dir $BUILD_WRAPPER_OUTPUT_DIR xcodebuild -workspace $WORKSPACE -scheme $SCHEME -sdk iphonesimulator -destination $DESTINATION
+  build-wrapper --out-dir $BUILD_WRAPPER_OUTPUT_DIR xcodebuild -workspace $WORKSPACE -scheme $SCHEME -sdk iphonesimulator -destination "platform=iOS Simulator,name=$SIMULATOR,OS=$OS_VERSION" build
 
   echo "~~~ xcodebuild test"
-  xcodebuild test -workspace $WORKSPACE -scheme $SCHEME -enableCodeCoverage YES -derivedDataPath build -sdk iphonesimulator -destination $DESTINATION build
+  xcodebuild test -workspace $WORKSPACE -scheme $SCHEME -enableCodeCoverage YES -derivedDataPath build -sdk iphonesimulator -destination "platform=iOS Simulator,name=$SIMULATOR,OS=$OS_VERSION" build
 
   cd ../
   echo "~~~ xcov-to-sonar"
 
   # Run the xccov-to-sonarqube-generic.sh script
-  ./xccov-to-sonarqube-generic.sh test-harness/build/Logs/Test/*.xcresult/ > Library/sonarqube-generic-coverage.xml
+  ./xccov-to-sonarqube-generic.sh test-harness/build/Logs/Test/*.xcresult/ > sonarqube-generic-coverage.xml
 
   # Run sonar-scanner
   sonar-scanner \
-  -Dsonar.cfamily.build-wrapper-output=$BUILD_WRAPPER_OUTPUT_DIR \
+  -Dsonar.cfamily.build-wrapper-output="$BUILD_WRAPPER_OUTPUT_DIR" \
   -Dsonar.coverageReportPaths=Library/sonarqube-generic-coverage.xml \
   -Dsonar.projectBaseDir=.
 }
@@ -101,8 +100,8 @@ function run_reactnative_ios_unit_tests() {
 
   ## Run ios unit tests
   echo "~~~ Run xcodebuild test"
-  xcodebuild -workspace $WORKSPACE -scheme $SCHEME -sdk iphonesimulator -destination $DESTINATION
-  xcodebuild -workspace $WORKSPACE -scheme $SCHEME -sdk iphonesimulator -destination $DESTINATION test
+  xcodebuild -workspace $WORKSPACE -scheme $SCHEME -sdk iphonesimulator -destination "platform=iOS Simulator,name=$SIMULATOR,OS=$OS_VERSION"
+  xcodebuild test -workspace $WORKSPACE -scheme $SCHEME -sdk iphonesimulator -destination "platform=iOS Simulator,name=$SIMULATOR,OS=$OS_VERSION"
 
   cd "$BASEDIR"
 }
