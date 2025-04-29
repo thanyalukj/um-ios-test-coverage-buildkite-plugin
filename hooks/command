@@ -35,7 +35,10 @@ function run_ios_unit_tests_and_sonar() {
   # add sleep due to sometimes "xcrun simctl list" takes more than a few moments and script fails when trying to remove CoreSimulatorSerivce
   sleep 10
 
+  xcrun simctl list devices
+
   # Set and boot the desired simulator with retries
+  echo "~~~ Set and boot the desired simulator with retries"
   RETRIES=5
   for i in $(seq 1 $RETRIES); do
     if xcrun simctl boot "$SIMULATOR"; then
