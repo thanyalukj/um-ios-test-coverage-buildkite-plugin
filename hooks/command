@@ -14,6 +14,7 @@ SKIP=$(buildkite-agent meta-data get 'skip-test' --default 'true')
 SIMULATOR="iPhone 16 Pro"
 OS_VERSION="18.2"
 BUILD_WRAPPER_OUTPUT_DIR="build_wrapper_output_directory"
+# Select Xcode 16.2
 sudo xcode-select --switch /Applications/Xcode_16.2.app/Contents/Developer
 
 function run_ios_unit_tests_and_sonar() {
