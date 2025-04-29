@@ -1,0 +1,118 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+## Setup variables from the plugin properties
+PLATFORM="${BUILDKITE_PLUGIN_UM_IOS_TEST_COVERAGE_PLATFORM:-undefined}"
+WORKSPACE="$BUILDKITE_PLUGIN_UM_IOS_TEST_COVERAGE_WORKSPACE"
+SCHEME="$BUILDKITE_PLUGIN_UM_IOS_TEST_COVERAGE_SCHEME"
+FD_NPM_READ_USERNAME="${BUILDKITE_PLUGIN_UM_IOS_TEST_COVERAGE_FD_NPM_READ_USERNAME:-undefined}"
+FD_NPM_AUTH_TOKEN="${BUILDKITE_PLUGIN_UM_IOS_TEST_COVERAGE_FD_NPM_AUTH_TOKEN_READ:-undefined}"
+FD_NPM_REPO="${BUILDKITE_PLUGIN_UM_IOS_TEST_COVERAGE_FD_NPM_REPO:-undefined}"
+
+## Setup variables from the environment
+SKIP=$(buildkite-agent meta-data get 'skip-test' --default 'true')
+SIMULATOR="iPhone 16"
+DESTINATION="platform=iOS Simulator,name=${SIMULATOR}"
+sudo xcode-select --switch /Applications/Xcode_16.2.app/Contents/Developer
+
+function run_ios_unit_tests_and_sonar() {
+  echo "--- :test_tube: Running iOS Unit Tests..."
+
+  rbenv install --skip-existing
+
+  # Install any missing gems
+  bundle install --quiet
+
+  # Below code stolen from https://github.com/actions/runner-images/blob/5a6e2158591c3f3b0c732691694d061fea8f792e/images/macos/scripts/build/configure-xcode.sh
+
+  # quit the CoreSimulatorService 
+  launchctl remove com.apple.CoreSimulator.CoreSimulatorService || true
+  # add sleep to let CoreSimulatorService to exit
+  sleep 3
+  # erase the devices
+  xcrun simctl erase all
+  # add sleep due to sometimes "xcrun simctl list" takes more than a few moments and script fails when trying to remove CoreSimulatorSerivce
+  sleep 10
+
+  # Set and boot the desired simulator with retries
+  RETRIES=5
+  for i in $(seq 1 $RETRIES); do
+    if xcrun simctl boot "$SIMULATOR"; then
+      echo "Simulator booted successfully"
+      break
+    else
+      echo "Failed to boot simulator, retrying... ($i/$RETRIES)"
+      sleep 10
+    fi
+  done
+
+  # Add sleep to ensure the simulator is fully booted
+  sleep 10
+
+  BASEDIR=$(pwd)
+
+  echo "~~~ Install iOS dependencies"
+  cd ios/library/test-harness
+  bundle install --quiet
+  bundle exec pod update
+
+  echo "~~~ build-wrapper"
+  build-wrapper --out-dir build_wrapper_output_directory xcodebuild -workspace $WORKSPACE -scheme $SCHEME -sdk iphonesimulator -destination $DESTINATION
+
+  echo "~~~ xcodebuild test"
+  xcodebuild test -workspace $WORKSPACE -scheme $SCHEME -enableCodeCoverage YES -derivedDataPath build -sdk iphonesimulator -destination $DESTINATION build
+
+  cd ../
+  echo "~~~ xcov-to-sonar"
+
+  # Run the xccov-to-sonarqube-generic.sh script
+  ./xccov-to-sonarqube-generic.sh test-harness/build/Logs/Test/*.xcresult/ > Library/sonarqube-generic-coverage.xml
+
+  # Run sonar-scanner
+  sonar-scanner \
+  -Dsonar.cfamily.build-wrapper-output=build-wrapper-output \
+  -Dsonar.coverageReportPaths=Library/sonarqube-generic-coverage.xml \
+  -Dsonar.projectBaseDir=.
+}
+
+function run_reactnative_ios_unit_tests() {
+  echo "--- :test_tube: Running react-native iOS Unit Tests..."
+
+  BASEDIR=$(pwd)
+
+  ## Install react-native dependencies  
+  echo "~~~ Install react-native dependencies"
+  cd react/library/
+  npm ci
+  cd test-harness
+  npm ci
+
+  ## Install ios dependencies  
+  echo "~~~ Install iOS dependencies"
+  rbenv install --skip-existing
+  bundle install --quiet
+  cd ios
+  bundle exec pod install
+
+  ## Run ios unit tests
+  echo "~~~ Run xcodebuild test"
+  xcodebuild -workspace $WORKSPACE -scheme $SCHEME -sdk iphonesimulator -destination $DESTINATION
+  xcodebuild -workspace $WORKSPACE -scheme $SCHEME -sdk iphonesimulator -destination $DESTINATION test
+
+  cd "$BASEDIR"
+}
+
+if [[ "$SKIP" == "true" ]]; then
+  echo "--- Skipping test as skip-test was set to true"
+  exit 0
+fi
+
+# Check if the platform is set to contract or library and perform steps accordingly
+if [[ "$PLATFORM" == "ios-library" ]]; then
+  run_ios_unit_tests_and_sonar
+elif [[ "$PLATFORM" == "react-library" ]]; then
+  run_reactnative_ios_unit_tests
+else
+  echo "--- :warning: Platform needs to be one of these: [ios-library, react-library]"
+  exit 0
+fi

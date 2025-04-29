@@ -1,0 +1,15 @@
+schema-version: v2.1
+dd-service: um-ios-test-coverage-buildkite-plugin
+team: playmakers
+tier: p3
+lifecycle: experimental
+description: Unified Module iOS Unit Tests and Coverage Report
+links:
+  - name: um-ios-test-coverage-buildkite-plugin
+    type: repo
+    url: https://github.com/fanduel/um-ios-test-coverage-buildkite-plugin
+    provider: github
+tags:
+  - domain:cpe
+  - vertical:enablement
+  - type:plugin

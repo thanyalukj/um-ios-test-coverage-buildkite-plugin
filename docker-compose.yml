@@ -1,0 +1,14 @@
+services:
+  lint:
+    image: buildkite/plugin-linter
+    command:
+      [
+        "--id",
+        "ssh://git@github.com/fanduel/um-ios-test-coverage-buildkite-plugin.git",
+      ]
+    volumes:
+      - ".:/plugin:ro"
+  tests:
+    image: buildkite/plugin-tester
+    volumes:
+      - ".:/plugin:ro"
