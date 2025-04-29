@@ -73,6 +73,7 @@ function run_ios_unit_tests_and_sonar() {
   ./xccov-to-sonarqube-generic.sh test-harness/build/Logs/Test/*.xcresult/ > sonarqube-generic-coverage.xml
 
   # Run sonar-scanner
+  echo "~~~ sonar-scanner"
   sonar-scanner \
   -Dsonar.pullrequest.key="$BUILDKITE_PULL_REQUEST" \
   -Dsonar.pullrequest.branch="$BUILDKITE_BRANCH" \
