@@ -11,8 +11,9 @@ FD_NPM_REPO="${BUILDKITE_PLUGIN_UM_IOS_TEST_COVERAGE_FD_NPM_REPO:-undefined}"
 
 ## Setup variables from the environment
 SKIP=$(buildkite-agent meta-data get 'skip-test' --default 'true')
-SIMULATOR="iPhone 16"
-DESTINATION="platform=iOS Simulator,name=${SIMULATOR}"
+SIMULATOR="iPhone 16 Pro"
+OS_VERSION="18.2"
+DESTINATION="platform=iOS Simulator,name=${SIMULATOR},OS=${OS_VERSION}"
 BUILD_WRAPPER_OUTPUT_DIR="build_wrapper_output_directory"
 sudo xcode-select --switch /Applications/Xcode_16.2.app/Contents/Developer
 
