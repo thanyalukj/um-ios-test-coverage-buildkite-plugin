@@ -5,9 +5,6 @@ set -euo pipefail
 PLATFORM="${BUILDKITE_PLUGIN_UM_IOS_TEST_COVERAGE_PLATFORM:-undefined}"
 WORKSPACE="$BUILDKITE_PLUGIN_UM_IOS_TEST_COVERAGE_WORKSPACE"
 SCHEME="$BUILDKITE_PLUGIN_UM_IOS_TEST_COVERAGE_SCHEME"
-# FD_NPM_READ_USERNAME="${BUILDKITE_PLUGIN_UM_IOS_TEST_COVERAGE_FD_NPM_READ_USERNAME:-undefined}"
-# FD_NPM_AUTH_TOKEN="${BUILDKITE_PLUGIN_UM_IOS_TEST_COVERAGE_FD_NPM_AUTH_TOKEN:-undefined}"
-# FD_NPM_REPO="${BUILDKITE_PLUGIN_UM_IOS_TEST_COVERAGE_FD_NPM_REPO:-undefined}"
 
 ## Setup variables
 SKIP=$(buildkite-agent meta-data get 'skip-test' --default 'true')
@@ -75,13 +72,22 @@ function run_ios_unit_tests_and_sonar() {
 
   # Run sonar-scanner
   echo "~~~ sonar-scanner"
-  sonar-scanner \
-  -Dsonar.pullrequest.key="$BUILDKITE_PULL_REQUEST" \
-  -Dsonar.pullrequest.branch="$BUILDKITE_BRANCH" \
-  -Dsonar.pullrequest.base="$BUILDKITE_PULL_REQUEST_BASE_BRANCH" \
-  -Dsonar.cfamily.build-wrapper-output="$BUILD_WRAPPER_OUTPUT_DIR" \
-  -Dsonar.coverageReportPaths=sonarqube-generic-coverage.xml \
-  -Dsonar.projectBaseDir=.
+  if [ -z "$BUILDKITE_PULL_REQUEST" ] then
+    sonar-scanner \
+      -Dsonar.branch.name=${BUILDKITE_BRANCH} \
+      -Dsonar.branch.target=${BUILDKITE_PULL_REQUEST_BASE_BRANCH} \      
+      -Dsonar.cfamily.build-wrapper-output="$BUILD_WRAPPER_OUTPUT_DIR" \
+      -Dsonar.coverageReportPaths=sonarqube-generic-coverage.xml \
+      -Dsonar.projectBaseDir=.
+  else
+    sonar-scanner \
+      -Dsonar.pullrequest.key="$BUILDKITE_PULL_REQUEST" \
+      -Dsonar.pullrequest.branch="$BUILDKITE_BRANCH" \
+      -Dsonar.pullrequest.base="$BUILDKITE_PULL_REQUEST_BASE_BRANCH" \
+      -Dsonar.cfamily.build-wrapper-output="$BUILD_WRAPPER_OUTPUT_DIR" \
+      -Dsonar.coverageReportPaths=sonarqube-generic-coverage.xml \
+      -Dsonar.projectBaseDir=.
+  fi
 }
 
 function run_reactnative_ios_unit_tests() {
@@ -93,7 +99,7 @@ function run_reactnative_ios_unit_tests() {
   cp .npmrc react/library/
   cp .npmrc react/library/test-harness/
 
-  ## Install react-native dependencies  
+  ## Install react-native dependencies
   echo "~~~ Install react-native dependencies"
   cd react/library/
   npm ci
