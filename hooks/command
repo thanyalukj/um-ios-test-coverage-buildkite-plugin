@@ -87,16 +87,11 @@ function run_ios_unit_tests_and_sonar() {
 function run_reactnative_ios_unit_tests() {
   echo "--- :test_tube: Running react-native iOS Unit Tests..."
 
-  echo "FD_NPM_READ_USERNAME = $FD_NPM_READ_USERNAME"
-  echo "FD_NPM_AUTH_TOKEN = ${FD_NPM_AUTH_TOKEN:0:16}"
-  echo "FD_NPM_REPO = $FD_NPM_REPO"
-
   BASEDIR=$(pwd)
 
   ## Install react-native dependencies  
   echo "~~~ Install react-native dependencies"
   cd react/library/
-  echo "$(<.npmrc)"
   npm ci
   
   cd test-harness
