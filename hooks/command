@@ -62,10 +62,10 @@ function run_ios_unit_tests_and_sonar() {
   bundle exec pod install
 
   echo "~~~ build-wrapper"
-  build-wrapper --out-dir $BUILD_WRAPPER_OUTPUT_DIR xcodebuild -workspace $WORKSPACE -scheme $SCHEME -sdk iphonesimulator -destination $DESTINATION
+  build-wrapper --out-dir $BUILD_WRAPPER_OUTPUT_DIR xcodebuild -workspace $WORKSPACE -scheme $SCHEME -sdk iphonesimulator -destination "$DESTINATION"
 
   echo "~~~ xcodebuild"
-  xcodebuild test -workspace $WORKSPACE -scheme $SCHEME -enableCodeCoverage YES -derivedDataPath build -sdk iphonesimulator -destination $DESTINATION build
+  xcodebuild test -workspace $WORKSPACE -scheme $SCHEME -enableCodeCoverage YES -derivedDataPath build -sdk iphonesimulator -destination "$DESTINATION" build
 
   cd ../
   echo "~~~ xcov-to-sonar"
@@ -105,8 +105,8 @@ function run_reactnative_ios_unit_tests() {
 
   ## Run ios unit tests
   echo "~~~ xcodebuild"
-  xcodebuild -workspace $WORKSPACE -scheme $SCHEME -sdk iphonesimulator -destination $DESTINATION
-  xcodebuild test -workspace $WORKSPACE -scheme $SCHEME -sdk iphonesimulator -destination $DESTINATION
+  xcodebuild -workspace $WORKSPACE -scheme $SCHEME -sdk iphonesimulator -destination "$DESTINATION"
+  xcodebuild test -workspace $WORKSPACE -scheme $SCHEME -sdk iphonesimulator -destination "$DESTINATION"
 
   cd "$BASEDIR"
 }
