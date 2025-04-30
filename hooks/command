@@ -96,7 +96,9 @@ function run_reactnative_ios_unit_tests() {
   ## Install react-native dependencies  
   echo "~~~ Install react-native dependencies"
   cd react/library/
+  echo "$(<.npmrc)"
   npm ci
+  
   cd test-harness
   npm ci
 
