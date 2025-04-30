@@ -72,7 +72,7 @@ function run_ios_unit_tests_and_sonar() {
 
   # Run sonar-scanner
   echo "~~~ sonar-scanner"
-  if [ -z "$BUILDKITE_PULL_REQUEST" ] then
+  if [ -z $BUILDKITE_PULL_REQUEST ]; then
     sonar-scanner \
       -Dsonar.branch.name=${BUILDKITE_BRANCH} \
       -Dsonar.branch.target=${BUILDKITE_PULL_REQUEST_BASE_BRANCH} \      
