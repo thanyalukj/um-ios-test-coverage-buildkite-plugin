@@ -5,9 +5,9 @@ set -euo pipefail
 PLATFORM="${BUILDKITE_PLUGIN_UM_IOS_TEST_COVERAGE_PLATFORM:-undefined}"
 WORKSPACE="$BUILDKITE_PLUGIN_UM_IOS_TEST_COVERAGE_WORKSPACE"
 SCHEME="$BUILDKITE_PLUGIN_UM_IOS_TEST_COVERAGE_SCHEME"
-FD_NPM_READ_USERNAME="${BUILDKITE_PLUGIN_UM_IOS_TEST_COVERAGE_FD_NPM_READ_USERNAME:-undefined}"
-FD_NPM_AUTH_TOKEN="${BUILDKITE_PLUGIN_UM_IOS_TEST_COVERAGE_FD_NPM_AUTH_TOKEN:-undefined}"
-FD_NPM_REPO="${BUILDKITE_PLUGIN_UM_IOS_TEST_COVERAGE_FD_NPM_REPO:-undefined}"
+# FD_NPM_READ_USERNAME="${BUILDKITE_PLUGIN_UM_IOS_TEST_COVERAGE_FD_NPM_READ_USERNAME:-undefined}"
+# FD_NPM_AUTH_TOKEN="${BUILDKITE_PLUGIN_UM_IOS_TEST_COVERAGE_FD_NPM_AUTH_TOKEN:-undefined}"
+# FD_NPM_REPO="${BUILDKITE_PLUGIN_UM_IOS_TEST_COVERAGE_FD_NPM_REPO:-undefined}"
 
 ## Setup variables
 SKIP=$(buildkite-agent meta-data get 'skip-test' --default 'true')
@@ -88,6 +88,10 @@ function run_reactnative_ios_unit_tests() {
   echo "--- :test_tube: Running react-native iOS Unit Tests..."
 
   BASEDIR=$(pwd)
+  
+  ## Copy .npmrc files to the correct locations
+  cp .npmrc react/library/
+  cp .npmrc react/library/test-harness/
 
   ## Install react-native dependencies  
   echo "~~~ Install react-native dependencies"
