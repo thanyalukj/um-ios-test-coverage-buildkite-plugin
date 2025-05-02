@@ -74,8 +74,8 @@ function run_ios_unit_tests_and_sonar() {
   if ([ -z "$BUILDKITE_PULL_REQUEST" ] || [ "$BUILDKITE_PULL_REQUEST" == "false" ]); then
     echo "~~~ sonar-scanner on ${BUILDKITE_BRANCH}"
     sonar-scanner \
-      -Dsonar.branch.name="${BUILDKITE_BRANCH}" \ 
-    -Dsonar.cfamily.build-wrapper-output="${BUILD_WRAPPER_OUTPUT_DIR}" \
+      -Dsonar.branch.name="${BUILDKITE_BRANCH}" \
+      -Dsonar.cfamily.build-wrapper-output="${BUILD_WRAPPER_OUTPUT_DIR}" \
       -Dsonar.coverageReportPaths=sonarqube-generic-coverage.xml \
       -Dsonar.projectBaseDir=.
   else
