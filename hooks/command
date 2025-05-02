@@ -26,7 +26,7 @@ function run_ios_unit_tests_and_sonar() {
 
   # Below code stolen from https://github.com/actions/runner-images/blob/5a6e2158591c3f3b0c732691694d061fea8f792e/images/macos/scripts/build/configure-xcode.sh
 
-  # quit the CoreSimulatorService 
+  # quit the CoreSimulatorService
   launchctl remove com.apple.CoreSimulator.CoreSimulatorService || true
   # add sleep to let CoreSimulatorService to exit
   sleep 3
@@ -68,18 +68,18 @@ function run_ios_unit_tests_and_sonar() {
   echo "~~~ xcov-to-sonar"
 
   # Run the xccov-to-sonarqube-generic.sh script
-  ./xccov-to-sonarqube-generic.sh test-harness/build/Logs/Test/*.xcresult/ > sonarqube-generic-coverage.xml
+  ./xccov-to-sonarqube-generic.sh test-harness/build/Logs/Test/*.xcresult/ >sonarqube-generic-coverage.xml
 
   # Run sonar-scanner
   if ([ -z "$BUILDKITE_PULL_REQUEST" ] || [ "$BUILDKITE_PULL_REQUEST" == "false" ]); then
-    echo "~~~ sonar-scanner on pr"
+    echo "~~~ sonar-scanner on ${BUILDKITE_BRANCH}"
     sonar-scanner \
-      -Dsonar.branch.name="${BUILDKITE_BRANCH}" \   
-      -Dsonar.cfamily.build-wrapper-output="${BUILD_WRAPPER_OUTPUT_DIR}" \
+      -Dsonar.branch.name="${BUILDKITE_BRANCH}" \ 
+    -Dsonar.cfamily.build-wrapper-output="${BUILD_WRAPPER_OUTPUT_DIR}" \
       -Dsonar.coverageReportPaths=sonarqube-generic-coverage.xml \
       -Dsonar.projectBaseDir=.
   else
-    echo "~~~ sonar-scanner on main branch"
+    echo "~~~ sonar-scanner on pr #${BUILDKITE_PULL_REQUEST}"
     sonar-scanner \
       -Dsonar.pullrequest.key="${BUILDKITE_PULL_REQUEST}" \
       -Dsonar.pullrequest.branch="${BUILDKITE_BRANCH}" \
@@ -94,7 +94,7 @@ function run_reactnative_ios_unit_tests() {
   echo "--- :test_tube: Running react-native iOS Unit Tests..."
 
   BASEDIR=$(pwd)
-  
+
   ## Copy .npmrc files to the correct locations
   cp .npmrc react/library/
   cp .npmrc react/library/test-harness/
@@ -103,11 +103,11 @@ function run_reactnative_ios_unit_tests() {
   echo "~~~ Install react-native dependencies"
   cd react/library/
   npm ci
-  
+
   cd test-harness
   npm ci
 
-  ## Install ios dependencies  
+  ## Install ios dependencies
   echo "~~~ Install iOS dependencies"
   rbenv install --skip-existing
   bundle install --quiet
