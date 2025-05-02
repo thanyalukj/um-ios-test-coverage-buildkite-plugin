@@ -74,16 +74,16 @@ function run_ios_unit_tests_and_sonar() {
   echo "~~~ sonar-scanner"
   if [[ $BUILDKITE_PULL_REQUEST == "false" ]]; then
     sonar-scanner \
-      -Dsonar.branch.name=${BUILDKITE_BRANCH} \   
-      -Dsonar.cfamily.build-wrapper-output="$BUILD_WRAPPER_OUTPUT_DIR" \
+      -Dsonar.branch.name="${BUILDKITE_BRANCH}" \   
+      -Dsonar.cfamily.build-wrapper-output="${BUILD_WRAPPER_OUTPUT_DIR}" \
       -Dsonar.coverageReportPaths=sonarqube-generic-coverage.xml \
       -Dsonar.projectBaseDir=.
   else
     sonar-scanner \
-      -Dsonar.pullrequest.key="$BUILDKITE_PULL_REQUEST" \
-      -Dsonar.pullrequest.branch="$BUILDKITE_BRANCH" \
-      -Dsonar.pullrequest.base="$BUILDKITE_PULL_REQUEST_BASE_BRANCH" \
-      -Dsonar.cfamily.build-wrapper-output="$BUILD_WRAPPER_OUTPUT_DIR" \
+      -Dsonar.pullrequest.key="${BUILDKITE_PULL_REQUEST}" \
+      -Dsonar.pullrequest.branch="${BUILDKITE_BRANCH}" \
+      -Dsonar.pullrequest.base="${BUILDKITE_PULL_REQUEST_BASE_BRANCH}" \
+      -Dsonar.cfamily.build-wrapper-output="${BUILD_WRAPPER_OUTPUT_DIR}" \
       -Dsonar.coverageReportPaths=sonarqube-generic-coverage.xml \
       -Dsonar.projectBaseDir=.
   fi

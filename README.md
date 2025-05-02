@@ -16,9 +16,6 @@ steps:
           platform: "ios-library"
           workspace: "AmplitudeUm.xcworkspace"
           scheme: "AmplitudeUm_TestHarness"
-          fd_npm_read_username: "username"
-          fd_npm_auth_token: "auth_token"
-          fd_npm_repo: "fd-npm"
     agents:
       ueue: macos-sonoma
 ```
@@ -36,18 +33,6 @@ Specifies the exact name of the Xcode workspace.
 ### `scheme` (Required, string)
 
 Specifies the exact name of the Xcode scheme.
-
-### `fd_npm_read_username` (Required, string)
-
-Specifies fd_npm_read_username. Is required only for `react-library` to run `npm ci` command.
-
-### `fd_npm_auth_token` (Required, string)
-
-Specifies fd_npm_auth_token. Is required only for `react-library` to run `npm ci` command.
-
-### `fd_npm_repo` (Required, string)
-
-Specifies fd_npm_repo. Is required only for `react-library` to run `npm ci` command.
 
 ## Development
 

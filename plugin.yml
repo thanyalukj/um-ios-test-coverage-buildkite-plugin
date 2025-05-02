@@ -13,10 +13,4 @@ configuration:
       type: string
     scheme:
       type: string
-    fd_npm_read_username:
-      type: string
-    fd_npm_auth_token:
-      type: string
-    fd_npm_repo:
-      type: string
   additionalProperties: false
