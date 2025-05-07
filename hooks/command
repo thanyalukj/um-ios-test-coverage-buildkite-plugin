@@ -81,7 +81,7 @@ function run_ios_unit_tests_and_sonar() {
   echo "~~~ xcov-to-sonar"
 
   # Run the xccov-to-sonarqube-generic.sh script
-  (covert_xcresult_to_generic_xml test-harness/build/Logs/Test/*.xcresult/) >${RESULT_FILE}
+  (covert_xcresult_to_generic_xml test-harness/build/Logs/Test/*.xcresult/) >$RESULT_FILE
 
   # Run sonar-scanner
   if ([ -z "$BUILDKITE_PULL_REQUEST" ] || [ "$BUILDKITE_PULL_REQUEST" == "false" ]); then
