@@ -60,25 +60,29 @@ function run_ios_unit_tests_and_sonar() {
 
   # Run the xccov-to-sonarqube-generic.sh script
   PROJECT_BASE_DIR=$(prop 'sonar.projectBaseDir' '.')
-  (covert_xcresult_to_generic_xml test-harness/build/Logs/Test/*.xcresult/) >$PROJECT_BASE_DIR/$SONAR_COVERAGE_FILE
+  SONAR_COVERAGE_FILE_PATH="${BASEDIR}/ios/library/${SONAR_COVERAGE_FILE}"
+  SONAR_SETTINGS_FILE_PATH="${BASEDIR}/ios/library/sonar-project.properties"
+  (covert_xcresult_to_generic_xml test-harness/build/Logs/Test/*.xcresult/) >$SONAR_COVERAGE_FILE_PATH
 
   # Run sonar-scanner
   if ([ -z "$BUILDKITE_PULL_REQUEST" ] || [ "$BUILDKITE_PULL_REQUEST" == "false" ]); then
     echo "~~~ sonar-scanner on branch ${BUILDKITE_BRANCH}"
     sonar-scanner \
+      -Dproject.settings="${SONAR_SETTINGS_FILE_PATH​}" \
+      -Dsonar.projectBaseDir="${PROJECT_BASE_DIR}" \
+      -Dsonar.coverageReportPaths="${SONAR_COVERAGE_FILE_PATH}" \
       -Dsonar.branch.name="${BUILDKITE_BRANCH}" \
-      -Dsonar.cfamily.build-wrapper-output="${BUILD_WRAPPER_OUTPUT_DIR}" \
-      -Dsonar.coverageReportPaths="${SONAR_COVERAGE_FILE}" \
-      -Dsonar.projectBaseDir="${PROJECT_BASE_DIR}"
+      -Dsonar.cfamily.build-wrapper-output="${BUILD_WRAPPER_OUTPUT_DIR}"
   else
     echo "~~~ sonar-scanner on pr #${BUILDKITE_PULL_REQUEST}"
     sonar-scanner \
+      -Dproject.settings="${SONAR_SETTINGS_FILE_PATH​}" \
+      -Dsonar.projectBaseDir="${PROJECT_BASE_DIR}" \
+      -Dsonar.coverageReportPaths="${SONAR_COVERAGE_FILE_PATH}" \
       -Dsonar.pullrequest.key="${BUILDKITE_PULL_REQUEST}" \
       -Dsonar.pullrequest.branch="${BUILDKITE_BRANCH}" \
       -Dsonar.pullrequest.base="${BUILDKITE_PULL_REQUEST_BASE_BRANCH}" \
-      -Dsonar.cfamily.build-wrapper-output="${BUILD_WRAPPER_OUTPUT_DIR}" \
-      -Dsonar.coverageReportPaths="${SONAR_COVERAGE_FILE}" \
-      -Dsonar.projectBaseDir="${PROJECT_BASE_DIR}"
+      -Dsonar.cfamily.build-wrapper-output="${BUILD_WRAPPER_OUTPUT_DIR}"
   fi
 }
 
