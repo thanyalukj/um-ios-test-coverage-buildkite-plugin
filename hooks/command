@@ -14,12 +14,12 @@ if [ ! $BUILD_ID == "" ]; then
   source "$DIR/../lib/functions.bash"
 fi
 
-## Setup variables from the plugin properties
+## Setup variables from the plugin
 PLATFORM="${BUILDKITE_PLUGIN_UM_IOS_TEST_COVERAGE_PLATFORM:-undefined}"
 WORKSPACE="$BUILDKITE_PLUGIN_UM_IOS_TEST_COVERAGE_WORKSPACE"
 SCHEME="$BUILDKITE_PLUGIN_UM_IOS_TEST_COVERAGE_SCHEME"
 
-## Setup variables
+## Setup environment variables
 SKIP=$(buildkite-agent meta-data get 'skip-test' --default 'true')
 SIMULATOR="iPhone 16"
 DESTINATION="platform=iOS Simulator,name=${SIMULATOR},OS=18.2"
