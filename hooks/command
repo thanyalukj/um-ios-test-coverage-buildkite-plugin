@@ -24,7 +24,7 @@ SIMULATOR="iPhone 16"
 OS_VERSION="18.2"
 DESTINATION="platform=iOS Simulator,name=${SIMULATOR},OS=${OS_VERSION}"
 BUILD_WRAPPER_OUTPUT_DIR="build_wrapper_output_directory"
-RESULT_FILE="Library/sonarqube-generic-coverage.xml"
+RESULT_FILE="sonarqube-generic-coverage.xml"
 
 # Select Xcode 16.2
 sudo xcode-select --switch /Applications/Xcode_16.2.app/Contents/Developer
