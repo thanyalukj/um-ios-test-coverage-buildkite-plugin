@@ -3,12 +3,6 @@ set -euo pipefail
 
 # This script performs read .xcresult and convert it to SonarQube generic XML format.
 # It uses `xcrun xccov` to extract coverage data from the .xcresult file.
-# <coverage version="1">
-#   <file path="/repo/um-amplitude/ios/library/library/AmplitudeUM.swift">
-#     <lineToCover lineNumber="23" covered="true"/>
-#     <lineToCover lineNumber="24" covered="true"/>
-#   </file>
-# </coverage>
 # Usage: ./xccov-to-sonarqube-generic.sh <path_to_xcresult> > <coverage.xml>
 # Example: ./xccov-to-sonarqube-generic.sh /path/to/your.xcresult > coverage.xml
 # For more information, see: https://github.com/SonarSource/sonar-scanning-examples/tree/master/swift-coverage
