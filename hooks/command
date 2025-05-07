@@ -89,7 +89,7 @@ function run_ios_unit_tests_and_sonar() {
     sonar-scanner \
       -Dsonar.branch.name="${BUILDKITE_BRANCH}" \
       -Dsonar.cfamily.build-wrapper-output="${BUILD_WRAPPER_OUTPUT_DIR}" \
-      -Dsonar.coverageReportPaths="${RESULT_FILE}" \
+      -Dsonar.coverageReportPaths="${RESULT_FILE}"
   else
     echo "~~~ sonar-scanner on pr #${BUILDKITE_PULL_REQUEST}"
     sonar-scanner \
@@ -97,7 +97,7 @@ function run_ios_unit_tests_and_sonar() {
       -Dsonar.pullrequest.branch="${BUILDKITE_BRANCH}" \
       -Dsonar.pullrequest.base="${BUILDKITE_PULL_REQUEST_BASE_BRANCH}" \
       -Dsonar.cfamily.build-wrapper-output="${BUILD_WRAPPER_OUTPUT_DIR}" \
-      -Dsonar.coverageReportPaths="${RESULT_FILE}" \
+      -Dsonar.coverageReportPaths="${RESULT_FILE}"
   fi
 }
 
