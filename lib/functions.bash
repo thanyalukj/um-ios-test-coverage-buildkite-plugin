@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 # This function retrieves the value of a specified key from the sonar-project.properties file.
 # $1 - key name, matched at beginning of line.
 function prop {
