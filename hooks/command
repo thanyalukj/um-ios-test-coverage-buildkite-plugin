@@ -25,6 +25,7 @@ SIMULATOR="iPhone 16"
 OS_VERSION="18.2"
 DESTINATION="platform=iOS Simulator,name=${SIMULATOR},OS=${OS_VERSION}"
 BUILD_WRAPPER_OUTPUT_DIR="build_wrapper_output_directory"
+SONAR_COVERAGE_FILE="sonarqube-generic-coverage.xml"
 
 # Select Xcode 16.2
 sudo xcode-select --switch /Applications/Xcode_16.2.app/Contents/Developer
@@ -58,30 +59,25 @@ function run_ios_unit_tests_and_sonar() {
   echo "~~~ xcov-to-sonar"
 
   # Run the xccov-to-sonarqube-generic.sh script
-  PROJECT_BASE_DIR=$(prop 'sonar.projectBaseDir' '.')
-  SONAR_COVERAGE_FILE_PATH="${BASEDIR}/ios/library/sonarqube-generic-coverage.xml"
-  SONAR_SETTINGS_FILE_PATH="${BASEDIR}/ios/library/sonar-project.properties"
-  (covert_xcresult_to_generic_xml test-harness/build/Logs/Test/*.xcresult/) >$SONAR_COVERAGE_FILE_PATH
+  (covert_xcresult_to_generic_xml test-harness/build/Logs/Test/*.xcresult/) >$SONAR_COVERAGE_FILE
 
   # Run sonar-scanner
   if ([ -z "$BUILDKITE_PULL_REQUEST" ] || [ "$BUILDKITE_PULL_REQUEST" == "false" ]); then
     echo "~~~ sonar-scanner on branch ${BUILDKITE_BRANCH}"
     sonar-scanner \
-      -Dproject.settings="${SONAR_SETTINGS_FILE_PATH​}" \
-      -Dsonar.projectBaseDir="${PROJECT_BASE_DIR}" \
-      -Dsonar.coverageReportPaths="${SONAR_COVERAGE_FILE_PATH}" \
       -Dsonar.branch.name="${BUILDKITE_BRANCH}" \
-      -Dsonar.cfamily.build-wrapper-output="${BUILD_WRAPPER_OUTPUT_DIR}"
+      -Dsonar.cfamily.build-wrapper-output="${BUILD_WRAPPER_OUTPUT_DIR}" \
+      -Dsonar.coverageReportPaths="${SONAR_COVERAGE_FILE}" \
+      -Dsonar.projectBaseDir=.
   else
     echo "~~~ sonar-scanner on pr #${BUILDKITE_PULL_REQUEST}"
     sonar-scanner \
-      -Dproject.settings="${SONAR_SETTINGS_FILE_PATH​}" \
-      -Dsonar.projectBaseDir="${PROJECT_BASE_DIR}" \
-      -Dsonar.coverageReportPaths="${SONAR_COVERAGE_FILE_PATH}" \
       -Dsonar.pullrequest.key="${BUILDKITE_PULL_REQUEST}" \
       -Dsonar.pullrequest.branch="${BUILDKITE_BRANCH}" \
       -Dsonar.pullrequest.base="${BUILDKITE_PULL_REQUEST_BASE_BRANCH}" \
-      -Dsonar.cfamily.build-wrapper-output="${BUILD_WRAPPER_OUTPUT_DIR}"
+      -Dsonar.cfamily.build-wrapper-output="${BUILD_WRAPPER_OUTPUT_DIR}" \
+      -Dsonar.coverageReportPaths="${SONAR_COVERAGE_FILE}" \
+      -Dsonar.projectBaseDir=.
   fi
 }
 
@@ -115,10 +111,9 @@ function run_reactnative_ios_unit_tests() {
   xcodebuild test -workspace $WORKSPACE -scheme $SCHEME -sdk iphonesimulator -destination "$DESTINATION"
 }
 
-#######################################################
-# Main script execution starts here
-#######################################################
-
+######################################################################
+# Main script execution
+######################################################################
 if [[ "$SKIP" == "true" ]]; then
   echo "--- Skipping test as skip-test was set to true"
   exit 0
