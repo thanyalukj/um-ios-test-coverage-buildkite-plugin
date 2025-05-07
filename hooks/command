@@ -38,8 +38,6 @@ function run_ios_unit_tests_and_sonar() {
 
   echo "~~~ Install iOS dependencies"
 
-  BASEDIR=$(pwd)
-
   rbenv install --skip-existing
 
   # Install any missing gems
@@ -92,8 +90,6 @@ function run_ios_unit_tests_and_sonar() {
 
 function run_reactnative_ios_unit_tests() {
   echo "--- :test_tube: Running react-native iOS Unit Tests..."
-
-  BASEDIR=$(pwd)
 
   ## Copy .npmrc files to the correct locations
   cp .npmrc react/library/
