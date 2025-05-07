@@ -1,6 +1,18 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+## Source functions.bash based on environment
+## local environment = BUILDKITE_BUILD_ID is not set
+## Buildkite environment = BUILDKITE_BUILD_ID is set
+BUILD_ID=${BUILDKITE_BUILD_ID:-""}
+if [ ! $BUILD_ID == "" ]; then
+  # shellcheck source=lib/functions.bash
+  # shellcheck disable=SC1091
+  source "$DIR/../lib/xccov-to-sonarqube-generic.bash"
+fi
+
 ## Setup variables from the plugin properties
 PLATFORM="${BUILDKITE_PLUGIN_UM_IOS_TEST_COVERAGE_PLATFORM:-undefined}"
 WORKSPACE="$BUILDKITE_PLUGIN_UM_IOS_TEST_COVERAGE_WORKSPACE"
@@ -12,6 +24,7 @@ SIMULATOR="iPhone 16"
 OS_VERSION="18.2"
 DESTINATION="platform=iOS Simulator,name=${SIMULATOR},OS=${OS_VERSION}"
 BUILD_WRAPPER_OUTPUT_DIR="build_wrapper_output_directory"
+RESULT_FILE="sonarqube-generic-coverage.xml"
 
 # Select Xcode 16.2
 sudo xcode-select --switch /Applications/Xcode_16.2.app/Contents/Developer
@@ -68,16 +81,15 @@ function run_ios_unit_tests_and_sonar() {
   echo "~~~ xcov-to-sonar"
 
   # Run the xccov-to-sonarqube-generic.sh script
-  ./xccov-to-sonarqube-generic.sh test-harness/build/Logs/Test/*.xcresult/ >sonarqube-generic-coverage.xml
+  $(covert_xcresult_to_generic_xml test-harness/build/Logs/Test/*.xcresult/) >${RESULT_FILE}
 
   # Run sonar-scanner
   if ([ -z "$BUILDKITE_PULL_REQUEST" ] || [ "$BUILDKITE_PULL_REQUEST" == "false" ]); then
-    echo "~~~ sonar-scanner on ${BUILDKITE_BRANCH}"
+    echo "~~~ sonar-scanner on branch ${BUILDKITE_BRANCH}"
     sonar-scanner \
       -Dsonar.branch.name="${BUILDKITE_BRANCH}" \
       -Dsonar.cfamily.build-wrapper-output="${BUILD_WRAPPER_OUTPUT_DIR}" \
-      -Dsonar.coverageReportPaths=sonarqube-generic-coverage.xml \
-      -Dsonar.projectBaseDir=.
+      -Dsonar.coverageReportPaths=${RESULT_FILE} \
   else
     echo "~~~ sonar-scanner on pr #${BUILDKITE_PULL_REQUEST}"
     sonar-scanner \
@@ -85,8 +97,7 @@ function run_ios_unit_tests_and_sonar() {
       -Dsonar.pullrequest.branch="${BUILDKITE_BRANCH}" \
       -Dsonar.pullrequest.base="${BUILDKITE_PULL_REQUEST_BASE_BRANCH}" \
       -Dsonar.cfamily.build-wrapper-output="${BUILD_WRAPPER_OUTPUT_DIR}" \
-      -Dsonar.coverageReportPaths=sonarqube-generic-coverage.xml \
-      -Dsonar.projectBaseDir=.
+      -Dsonar.coverageReportPaths=${RESULT_FILE} \
   fi
 }
 
