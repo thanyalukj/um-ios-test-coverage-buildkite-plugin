@@ -1,0 +1,34 @@
+name: 'Tag/Release Conventional Commit on Push Action'
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  tag:
+    runs-on: ubuntu-latest
+    steps:
+      - id: checkout
+        uses: actions/checkout@v3
+
+      - id: tag
+        uses: TriPSs/conventional-changelog-action@v6
+        with:
+          preset: 'conventionalcommits'
+          github-token: ${{ secrets.github_token }}
+          output-file: 'false'
+          skip-on-empty: 'true'
+          skip-version-file: 'true'
+          skip-commit: 'true'
+
+      - id: release
+        uses: softprops/action-gh-release@v2.2.0
+        if: ${{ steps.tag.outputs.skipped == 'false' }}
+        with:
+          repo_token: ${{ secrets.github_token }}
+          prerelease: false
+          automatic_release_tag: ${{ steps.tag.outputs.tag }}
+          name: ${{ steps.tag.outputs.tag }}
+          tag_name: ${{ steps.tag.outputs.tag }}
+          generate_release_notes: true
