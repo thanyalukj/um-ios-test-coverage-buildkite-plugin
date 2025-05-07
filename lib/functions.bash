@@ -9,6 +9,7 @@ function prop {
     grep "^${key}" ${sonar_project_properties}|cut -d'=' -f2
 }
 
+# Boot an iOS simulator with retries
 # Below code stolen from https://github.com/actions/runner-images/blob/5a6e2158591c3f3b0c732691694d061fea8f792e/images/macos/scripts/build/configure-xcode.sh
 function boot_simulator {
     local simulator_name=$1
