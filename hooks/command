@@ -11,6 +11,7 @@ if [ ! $BUILD_ID == "" ]; then
   # shellcheck source=lib/functions.bash
   # shellcheck disable=SC1091
   source "$DIR/../lib/xccov-to-sonarqube-generic.bash"
+  source "$DIR/../lib/functions.bash"
 fi
 
 ## Setup variables from the plugin properties
@@ -32,41 +33,18 @@ sudo xcode-select --switch /Applications/Xcode_16.2.app/Contents/Developer
 function run_ios_unit_tests_and_sonar() {
   echo "--- :test_tube: Running iOS Unit Tests..."
 
+  echo "~~~ Boot a simulator: $DESTINATION"
+  boot_simulator "$SIMULATOR"
+
+  echo "~~~ Install iOS dependencies"
+
+  BASEDIR=$(pwd)
+
   rbenv install --skip-existing
 
   # Install any missing gems
   bundle install --quiet
 
-  # Below code stolen from https://github.com/actions/runner-images/blob/5a6e2158591c3f3b0c732691694d061fea8f792e/images/macos/scripts/build/configure-xcode.sh
-
-  # quit the CoreSimulatorService
-  launchctl remove com.apple.CoreSimulator.CoreSimulatorService || true
-  # add sleep to let CoreSimulatorService to exit
-  sleep 3
-  # erase the devices
-  xcrun simctl erase all
-  # add sleep due to sometimes "xcrun simctl list" takes more than a few moments and script fails when trying to remove CoreSimulatorSerivce
-  sleep 10
-
-  # Set and boot the desired simulator with retries
-  echo "~~~ Set and boot the desired simulator with retries"
-  RETRIES=5
-  for i in $(seq 1 $RETRIES); do
-    if xcrun simctl boot "$SIMULATOR"; then
-      echo "Simulator booted successfully"
-      break
-    else
-      echo "Failed to boot simulator, retrying... ($i/$RETRIES)"
-      sleep 10
-    fi
-  done
-
-  # Add sleep to ensure the simulator is fully booted
-  sleep 10
-
-  BASEDIR=$(pwd)
-
-  echo "~~~ Install iOS dependencies"
   cd ios/library/test-harness
   bundle install --quiet
   bundle exec pod install
@@ -81,7 +59,8 @@ function run_ios_unit_tests_and_sonar() {
   echo "~~~ xcov-to-sonar"
 
   # Run the xccov-to-sonarqube-generic.sh script
-  (covert_xcresult_to_generic_xml test-harness/build/Logs/Test/*.xcresult/) >$SONAR_COVERAGE_FILE
+  PROJECT_BASE_DIR=$(prop 'sonar.projectBaseDir' '.')
+  (covert_xcresult_to_generic_xml test-harness/build/Logs/Test/*.xcresult/) >$PROJECT_BASE_DIR/$SONAR_COVERAGE_FILE
 
   # Run sonar-scanner
   if ([ -z "$BUILDKITE_PULL_REQUEST" ] || [ "$BUILDKITE_PULL_REQUEST" == "false" ]); then
@@ -132,6 +111,10 @@ function run_reactnative_ios_unit_tests() {
   xcodebuild -workspace $WORKSPACE -scheme $SCHEME -sdk iphonesimulator -destination "$DESTINATION"
   xcodebuild test -workspace $WORKSPACE -scheme $SCHEME -sdk iphonesimulator -destination "$DESTINATION"
 }
+
+#######################################################
+# Main script execution starts here
+#######################################################
 
 if [[ "$SKIP" == "true" ]]; then
   echo "--- Skipping test as skip-test was set to true"
