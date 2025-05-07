@@ -61,16 +61,20 @@ function run_ios_unit_tests_and_sonar() {
   # Run the xccov-to-sonarqube-generic.sh script
   (covert_xcresult_to_generic_xml test-harness/build/Logs/Test/*.xcresult/) >$SONAR_COVERAGE_FILE
 
+  SONAR_PROJECT_KEY=$(prop "sonar.projectKey")
+
   # Run sonar-scanner
   if ([ -z "$BUILDKITE_PULL_REQUEST" ] || [ "$BUILDKITE_PULL_REQUEST" == "false" ]); then
-    echo "~~~ sonar-scanner on branch ${BUILDKITE_BRANCH}"
+    echo "~~~ sonar-scanner on branch: ${BUILDKITE_BRANCH}"
+    sonar_url="https://sonarcloud.io/dashboard?id=${SONAR_PROJECT_KEY}&branch=${BUILDKITE_BRANCH}"
     sonar-scanner \
       -Dsonar.branch.name="${BUILDKITE_BRANCH}" \
       -Dsonar.cfamily.build-wrapper-output="${BUILD_WRAPPER_OUTPUT_DIR}" \
       -Dsonar.coverageReportPaths="${SONAR_COVERAGE_FILE}" \
       -Dsonar.projectBaseDir=.
   else
-    echo "~~~ sonar-scanner on pr #${BUILDKITE_PULL_REQUEST}"
+    echo "~~~ sonar-scanner on pr: #${BUILDKITE_PULL_REQUEST}"
+    sonar_url="https://sonarcloud.io/dashboard?id=${SONAR_PROJECT_KEY}&branch=${BUILDKITE_BRANCH}"
     sonar-scanner \
       -Dsonar.pullrequest.key="${BUILDKITE_PULL_REQUEST}" \
       -Dsonar.pullrequest.branch="${BUILDKITE_BRANCH}" \
@@ -79,6 +83,11 @@ function run_ios_unit_tests_and_sonar() {
       -Dsonar.coverageReportPaths="${SONAR_COVERAGE_FILE}" \
       -Dsonar.projectBaseDir=.
   fi
+
+  buildkite-agent annotate \
+    --style "info" \
+    --context "sonarcloud-url" \
+    ":sonarcloud: Analysed __${SONAR_PROJECT_KEY}__ in [Sonarcloud]($sonar_url)" \
 }
 
 function run_reactnative_ios_unit_tests() {
