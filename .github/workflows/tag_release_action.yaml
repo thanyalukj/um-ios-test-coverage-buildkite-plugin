@@ -16,7 +16,7 @@ jobs:
         uses: TriPSs/conventional-changelog-action@v6
         with:
           preset: 'conventionalcommits'
-          github-token: ${{ secrets.github_token }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           output-file: 'false'
           skip-on-empty: 'true'
           skip-version-file: 'true'
@@ -26,7 +26,7 @@ jobs:
         uses: softprops/action-gh-release@v2.2.0
         if: ${{ steps.tag.outputs.skipped == 'false' }}
         with:
-          repo_token: ${{ secrets.github_token }}
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
           prerelease: false
           automatic_release_tag: ${{ steps.tag.outputs.tag }}
           name: ${{ steps.tag.outputs.tag }}
