@@ -41,3 +41,16 @@ To execute the tests, run the following command:
 ```shell
 docker-compose run --rm tests
 ```
+
+## Contributing
+
+This project is tagged automatically by a GitHub action. Conventional Commit prefix is used used to determine the change to the version tag.
+
+Apply one of the prefixes to the PR title as described below to increment the build number:
+
+* `chore: ` Will not create a new version tag
+* `fix: ` Will bump the last digit - patch version
+* `feat: ` - Will bump the middle digit - minor version
+* `feat!: ` - Will bump the first digit - major version (breaking change)
+
+See [conventional commit documentation](https://www.conventionalcommits.org/en/v1.0.0/) for more details.
