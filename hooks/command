@@ -22,8 +22,7 @@ SCHEME="$BUILDKITE_PLUGIN_UM_IOS_TEST_COVERAGE_SCHEME"
 ## Setup variables
 SKIP=$(buildkite-agent meta-data get 'skip-test' --default 'true')
 SIMULATOR="iPhone 16"
-OS_VERSION="18.2"
-DESTINATION="platform=iOS Simulator,name=${SIMULATOR},OS=${OS_VERSION}"
+DESTINATION="platform=iOS Simulator,name=${SIMULATOR},OS=18.2"
 BUILD_WRAPPER_OUTPUT_DIR="build_wrapper_output_directory"
 SONAR_COVERAGE_FILE="sonarqube-generic-coverage.xml"
 
