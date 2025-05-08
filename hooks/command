@@ -44,7 +44,7 @@ function run_ios_unit_tests_and_sonar() {
   # Install any missing gems
   bundle install --quiet
 
-  cd ios/library/test-harness
+  cd test-harness
   bundle install --quiet
   bundle exec pod install
 
