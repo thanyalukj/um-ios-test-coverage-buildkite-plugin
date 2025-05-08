@@ -38,7 +38,7 @@ function run_ios_unit_tests_and_sonar() {
   echo "~~~ Install iOS dependencies"
 
   cd ios/library
-  
+
   rbenv install --skip-existing
 
   # Install any missing gems
@@ -73,7 +73,7 @@ function run_ios_unit_tests_and_sonar() {
       -Dsonar.projectBaseDir=.
   else
     echo "~~~ sonar-scanner on pr: #${BUILDKITE_PULL_REQUEST}"
-    sonar_url="https://sonarcloud.io/dashboard?id=${SONAR_PROJECT_KEY}&branch=${BUILDKITE_BRANCH}"
+    sonar_url="https://sonarcloud.io/dashboard?id=${SONAR_PROJECT_KEY}&pullRequest=${BUILDKITE_PULL_REQUEST}"
     sonar-scanner \
       -Dsonar.pullrequest.key="${BUILDKITE_PULL_REQUEST}" \
       -Dsonar.pullrequest.branch="${BUILDKITE_BRANCH}" \
