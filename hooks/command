@@ -19,10 +19,11 @@ PLATFORM="${BUILDKITE_PLUGIN_UM_IOS_TEST_COVERAGE_PLATFORM:-undefined}"
 WORKSPACE="$BUILDKITE_PLUGIN_UM_IOS_TEST_COVERAGE_WORKSPACE"
 SCHEME="$BUILDKITE_PLUGIN_UM_IOS_TEST_COVERAGE_SCHEME"
 
-## Setup other variables
+## Setup variables
 SKIP=$(buildkite-agent meta-data get 'skip-test' --default 'true')
 SIMULATOR="iPhone 16"
-DESTINATION="platform=iOS Simulator,name=${SIMULATOR},OS=18.2"
+OS_VERSION="18.2"
+DESTINATION="platform=iOS Simulator,name=${SIMULATOR},OS=${OS_VERSION}"
 BUILD_WRAPPER_OUTPUT_DIR="build_wrapper_output_directory"
 SONAR_COVERAGE_FILE="sonarqube-generic-coverage.xml"
 
@@ -51,7 +52,7 @@ function run_ios_unit_tests_and_sonar() {
   echo "~~~ xcodebuild"
   xcodebuild test -workspace $WORKSPACE -scheme $SCHEME -enableCodeCoverage YES -derivedDataPath build -sdk iphonesimulator -destination "$DESTINATION" build
 
-  echo "~~~ xccov-to-sonar"
+  echo "~~~ xcov-to-sonar"
   cd ../
   (covert_xcresult_to_generic_xml test-harness/build/Logs/Test/*.xcresult/) >$SONAR_COVERAGE_FILE
 
