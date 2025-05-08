@@ -37,6 +37,8 @@ function run_ios_unit_tests_and_sonar() {
 
   echo "~~~ Install iOS dependencies"
 
+  cd ios/library
+  
   rbenv install --skip-existing
 
   # Install any missing gems
