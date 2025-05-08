@@ -14,12 +14,12 @@ if [ ! $BUILD_ID == "" ]; then
   source "$DIR/../lib/functions.bash"
 fi
 
-## Setup variables from the plugin
+## Setup variables from the plugin properties
 PLATFORM="${BUILDKITE_PLUGIN_UM_IOS_TEST_COVERAGE_PLATFORM:-undefined}"
 WORKSPACE="$BUILDKITE_PLUGIN_UM_IOS_TEST_COVERAGE_WORKSPACE"
 SCHEME="$BUILDKITE_PLUGIN_UM_IOS_TEST_COVERAGE_SCHEME"
 
-## Setup environment variables
+## Setup other variables
 SKIP=$(buildkite-agent meta-data get 'skip-test' --default 'true')
 SIMULATOR="iPhone 16"
 DESTINATION="platform=iOS Simulator,name=${SIMULATOR},OS=18.2"
@@ -38,10 +38,7 @@ function run_ios_unit_tests_and_sonar() {
   echo "~~~ Install iOS dependencies"
 
   cd ios/library
-
   rbenv install --skip-existing
-
-  # Install any missing gems
   bundle install --quiet
 
   cd test-harness
@@ -54,15 +51,12 @@ function run_ios_unit_tests_and_sonar() {
   echo "~~~ xcodebuild"
   xcodebuild test -workspace $WORKSPACE -scheme $SCHEME -enableCodeCoverage YES -derivedDataPath build -sdk iphonesimulator -destination "$DESTINATION" build
 
+  echo "~~~ xccov-to-sonar"
   cd ../
-  echo "~~~ xcov-to-sonar"
-
-  # Run the xccov-to-sonarqube-generic.sh script
   (covert_xcresult_to_generic_xml test-harness/build/Logs/Test/*.xcresult/) >$SONAR_COVERAGE_FILE
 
-  SONAR_PROJECT_KEY=$(prop "sonar.projectKey")
-
   # Run sonar-scanner
+  SONAR_PROJECT_KEY=$(prop "sonar.projectKey")
   if ([ -z "$BUILDKITE_PULL_REQUEST" ] || [ "$BUILDKITE_PULL_REQUEST" == "false" ]); then
     echo "~~~ sonar-scanner on branch: ${BUILDKITE_BRANCH}"
     sonar_url="https://sonarcloud.io/dashboard?id=${SONAR_PROJECT_KEY}&branch=${BUILDKITE_BRANCH}"
@@ -100,7 +94,6 @@ function run_reactnative_ios_unit_tests() {
   echo "~~~ Install react-native dependencies"
   cd react/library/
   npm ci
-
   cd test-harness
   npm ci
 

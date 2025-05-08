@@ -8,11 +8,11 @@ set -euo pipefail
 # For more information, see: https://github.com/SonarSource/sonar-scanning-examples/tree/master/swift-coverage
 
 function convert_xccov_to_xml {
-  sed -n                                                                                       \
-      -e '/:$/s/&/\&amp;/g;s/^\(.*\):$/  <file path="\1">/p'                                   \
-      -e 's/^ *\([0-9][0-9]*\): 0.*$/    <lineToCover lineNumber="\1" covered="false"\/>/p'    \
-      -e 's/^ *\([0-9][0-9]*\): [1-9].*$/    <lineToCover lineNumber="\1" covered="true"\/>/p' \
-      -e 's/^$/  <\/file>/p'
+  sed -n \
+    -e '/:$/s/&/\&amp;/g;s/^\(.*\):$/  <file path="\1">/p' \
+    -e 's/^ *\([0-9][0-9]*\): 0.*$/    <lineToCover lineNumber="\1" covered="false"\/>/p' \
+    -e 's/^ *\([0-9][0-9]*\): [1-9].*$/    <lineToCover lineNumber="\1" covered="true"\/>/p' \
+    -e 's/^$/  <\/file>/p'
 }
 
 function xccov_to_generic {
@@ -30,9 +30,8 @@ function cleanup_tmp_files {
 
 function check_xcode_version() {
   local major=${1:-0} minor=${2:-0}
-  return $(( (major >= 14) || (major == 13 && minor >= 3) ))
+  return $(((major >= 14) || (major == 13 && minor >= 3)))
 }
-
 
 function covert_xcresult_to_generic_xml {
   local xcresult="$1"
@@ -41,7 +40,7 @@ function covert_xcresult_to_generic_xml {
     echo 'Failed to get Xcode version' 1>&2
     exit 1
   elif check_xcode_version ${xcode_version//./ }; then
-    echo "Xcode version '$xcode_version' not supported, version 13.3 or above is required" 1>&2;
+    echo "Xcode version '$xcode_version' not supported, version 13.3 or above is required" 1>&2
     exit 1
   fi
 
@@ -49,10 +48,10 @@ function covert_xcresult_to_generic_xml {
     echo "Invalid number of arguments. Expecting 1 path matching '*.xcresult'"
     exit 1
   elif [[ ! -d $xcresult ]]; then
-    echo "Path not found: $xcresult" 1>&2;
+    echo "Path not found: $xcresult" 1>&2
     exit 1
   elif [[ $xcresult != *".xcresult"* ]]; then
-    echo "Expecting input to match '*.xcresult', got: $xcresult" 1>&2;
+    echo "Expecting input to match '*.xcresult', got: $xcresult" 1>&2
     exit 1
   fi
 
