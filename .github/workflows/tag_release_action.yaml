@@ -17,9 +17,9 @@ jobs:
         with:
           preset: 'conventionalcommits'
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          output-file: 'false'
           skip-on-empty: 'true'
-          skip-version-file: 'true'
+          version-file: './plugin.yml'
+          skip-version-file: 'false'
           skip-commit: 'true'
 
       - id: release
