@@ -62,21 +62,9 @@ function run_ios_unit_tests_and_sonar() {
   if ([ -z "$BUILDKITE_PULL_REQUEST" ] || [ "$BUILDKITE_PULL_REQUEST" == "false" ]); then
     echo "~~~ sonar-scanner on branch: ${BUILDKITE_BRANCH}"
     sonar_url="https://sonarcloud.io/dashboard?id=${SONAR_PROJECT_KEY}&branch=${BUILDKITE_BRANCH}"
-    sonar-scanner \
-      -Dsonar.branch.name="${BUILDKITE_BRANCH}" \
-      -Dsonar.cfamily.build-wrapper-output="${BUILD_WRAPPER_OUTPUT_DIR}" \
-      -Dsonar.coverageReportPaths="${SONAR_COVERAGE_FILE}" \
-      -Dsonar.projectBaseDir=.
   else
     echo "~~~ sonar-scanner on pr: #${BUILDKITE_PULL_REQUEST}"
     sonar_url="https://sonarcloud.io/dashboard?id=${SONAR_PROJECT_KEY}&pullRequest=${BUILDKITE_PULL_REQUEST}"
-    sonar-scanner \
-      -Dsonar.pullrequest.key="${BUILDKITE_PULL_REQUEST}" \
-      -Dsonar.pullrequest.branch="${BUILDKITE_BRANCH}" \
-      -Dsonar.pullrequest.base="${BUILDKITE_PULL_REQUEST_BASE_BRANCH}" \
-      -Dsonar.cfamily.build-wrapper-output="${BUILD_WRAPPER_OUTPUT_DIR}" \
-      -Dsonar.coverageReportPaths="${SONAR_COVERAGE_FILE}" \
-      -Dsonar.projectBaseDir=.
   fi
 
   buildkite-agent annotate \
