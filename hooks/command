@@ -30,6 +30,7 @@ SONAR_COVERAGE_FILE="sonarqube-generic-coverage.xml"
 # Select Xcode 16.2
 sudo xcode-select --switch /Applications/Xcode_16.2.app/Contents/Developer
 
+# run ios unit tests and sonar scanner
 function run_ios_unit_tests_and_sonar() {
   echo "--- :test_tube: Running iOS Unit Tests..."
 
