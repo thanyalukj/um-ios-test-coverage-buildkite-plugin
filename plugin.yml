@@ -1,5 +1,5 @@
 name: um-ios-test-coverage
-version: 1.0.3
+version: 1.1.26
 title: UM iOS Test Coverage
 description: Runs UM iOS Unit Tests and Generates Coverage Report
 author: https://github.com/thanyalukj
@@ -8,7 +8,7 @@ configuration:
   properties:
     platform:
       type: string
-      enum: ['ios-library', 'react-library']
+      enum: ["ios-library", "react-library"]
     workspace:
       type: string
     scheme:
