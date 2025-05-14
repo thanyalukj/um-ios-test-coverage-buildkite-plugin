@@ -85,6 +85,7 @@ function run_ios_unit_tests_and_sonar() {
     ":sonarcloud: Analysed __${SONAR_PROJECT_KEY}__ in [Sonarcloud]($sonar_url)"
 }
 
+# run react-native ios unit tests
 function run_reactnative_ios_unit_tests() {
   echo "--- :test_tube: Running react-native iOS Unit Tests..."
 
