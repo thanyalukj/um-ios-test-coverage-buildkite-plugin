@@ -57,16 +57,6 @@ function run_ios_unit_tests_and_sonar() {
   cd ../
   (covert_xcresult_to_generic_xml test-harness/build/Logs/Test/*.xcresult/) >$SONAR_COVERAGE_FILE
 
-  # Run sonar-scanner
-  SONAR_PROJECT_KEY=$(prop "sonar.projectKey")
-  if ([ -z "$BUILDKITE_PULL_REQUEST" ] || [ "$BUILDKITE_PULL_REQUEST" == "false" ]); then
-    echo "~~~ sonar-scanner on branch: ${BUILDKITE_BRANCH}"
-    sonar_url="https://sonarcloud.io/dashboard?id=${SONAR_PROJECT_KEY}&branch=${BUILDKITE_BRANCH}"
-  else
-    echo "~~~ sonar-scanner on pr: #${BUILDKITE_PULL_REQUEST}"
-    sonar_url="https://sonarcloud.io/dashboard?id=${SONAR_PROJECT_KEY}&pullRequest=${BUILDKITE_PULL_REQUEST}"
-  fi
-
   buildkite-agent annotate \
     --style "info" \
     --context "sonarcloud-url" \
@@ -76,24 +66,6 @@ function run_ios_unit_tests_and_sonar() {
 # run react-native ios unit tests
 function run_reactnative_ios_unit_tests() {
   echo "--- :test_tube: Running react-native iOS Unit Tests..."
-
-  ## Copy .npmrc files to the correct locations
-  cp .npmrc react/library/
-  cp .npmrc react/library/test-harness/
-
-  ## Install react-native dependencies
-  echo "~~~ Install react-native dependencies"
-  cd react/library/
-  npm ci
-  cd test-harness
-  npm ci
-
-  ## Install ios dependencies
-  echo "~~~ Install iOS dependencies"
-  rbenv install --skip-existing
-  bundle install --quiet
-  cd ios
-  bundle exec pod install
 
   ## Run ios unit tests
   echo "~~~ xcodebuild"
