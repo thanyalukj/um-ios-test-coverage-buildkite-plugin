@@ -40,18 +40,18 @@ function run_ios_unit_tests_and_sonar() {
   echo "~~~ Install iOS dependencies"
 
   cd ios/library
-  rbenv install --skip-existing
-  bundle install --quiet
+
+  echo "rbenv install and bundle install"
 
   cd test-harness
-  bundle install --quiet
-  bundle exec pod install
+
+  echo "bundle install"
 
   echo "~~~ build-wrapper"
-  build-wrapper --out-dir $BUILD_WRAPPER_OUTPUT_DIR xcodebuild -workspace $WORKSPACE -scheme $SCHEME -sdk iphonesimulator -destination "$DESTINATION"
+  build-wrapper --out-dir $BUILD_WRAPPER_OUTPUT_DIR xcodebuild -workspace $WORKSPACE -scheme $SCHEME -sdk iphonesimulator -destination "$DESTINATION" | xcbeautify
 
   echo "~~~ xcodebuild"
-  xcodebuild test -workspace $WORKSPACE -scheme $SCHEME -enableCodeCoverage YES -derivedDataPath build -sdk iphonesimulator -destination "$DESTINATION" build
+  xcodebuild test -workspace $WORKSPACE -scheme $SCHEME -enableCodeCoverage YES -derivedDataPath build -sdk iphonesimulator -destination "$DESTINATION" build | xcbeautify
 
   echo "~~~ xcov-to-sonar"
   cd ../
