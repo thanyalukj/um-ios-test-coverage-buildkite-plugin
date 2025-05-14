@@ -85,6 +85,7 @@ function run_ios_unit_tests_and_sonar() {
     ":sonarcloud: Analysed __${SONAR_PROJECT_KEY}__ in [Sonarcloud]($sonar_url)"
 }
 
+# run react-native ios unit tests
 function run_reactnative_ios_unit_tests() {
   echo "--- :test_tube: Running react-native iOS Unit Tests..."
 
@@ -115,15 +116,15 @@ function run_reactnative_ios_unit_tests() {
 ######################################################################
 # Main script execution
 ######################################################################
-if [[ "$SKIP" == "true" ]]; then
+if [[ $SKIP == "true" ]]; then
   echo "--- Skipping test as skip-test was set to true"
   exit 0
 fi
 
 # Check if the platform is set to contract or library and perform steps accordingly
-if [[ "$PLATFORM" == "ios-library" ]]; then
+if [[ $PLATFORM == "ios-library" ]]; then
   run_ios_unit_tests_and_sonar
-elif [[ "$PLATFORM" == "react-library" ]]; then
+elif [[ $PLATFORM == "react-library" ]]; then
   run_reactnative_ios_unit_tests
 else
   echo "--- :warning: Platform needs to be one of these: [ios-library, react-library]"
